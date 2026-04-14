@@ -6,6 +6,7 @@ from pathlib import Path
 
 ASSETS_ROOT = Path(__file__).parent / "assets"
 DEFAULT_IMGUI_INI = ASSETS_ROOT / "default_imgui.ini"
+FONT_PATH = ASSETS_ROOT / "fonts" / "NotoSansCJKsc-Regular.otf"
 
 SCALAR_TRANSFORM_METHODS = ("identity", "log_e", "log_10")
 

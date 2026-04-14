@@ -65,7 +65,7 @@ build-backend = "setuptools.build_meta"
 py-modules = ["yumo2"]
 
 [tool.setuptools.package-data]
-"yumo2" = ["assets/*.ini", "assets/colormaps/*.png", "assets/materials/*.hdr"]
+"yumo2" = ["assets/*.ini", "assets/colormaps/*.png", "assets/materials/*.hdr", "assets/fonts/*.otf"]
 
 [tool.mypy]
 files = [

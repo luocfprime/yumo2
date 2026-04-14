@@ -11,6 +11,10 @@
 *.hdr binary
 
 # Fonts or other binaries
+*.otf binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
 *.pdf binary
 *.zip binary
 *.exe binary

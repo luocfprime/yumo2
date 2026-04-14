@@ -22,6 +22,7 @@ from yumo2.constants import (
     DEFAULT_COLORMAP,
     DEFAULT_IMGUI_INI,
     DEFAULT_MATERIAL,
+    FONT_PATH,
 )
 from yumo2.features import Picker, Scope, Snapshot
 from yumo2.loader import load_mesh, load_scalar_field
@@ -263,6 +264,15 @@ class PolyscopeApp:
         ps.set_ground_plane_mode("shadow_only")
         ps.set_up_dir("z_up")
         ps.set_front_dir("x_front")
+        if FONT_PATH.exists():
+
+            def _prepare_fonts(font_atlas):
+                font = font_atlas.AddFontFromFileTTF(str(FONT_PATH), 20.0)
+                return font, font
+
+            ps.set_prepare_imgui_fonts_callback(_prepare_fonts)
+        else:
+            logger.warning("cjk_font_not_found", path=str(FONT_PATH))
         ps.init()
 
         self._loaded_cmaps = load_colormaps(ps, ASSETS_ROOT / "colormaps")
