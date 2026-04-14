@@ -9,6 +9,7 @@ from yumo2.texture import (
     apply_denoise,
     bake_texture,
     build_face_map,
+    pad_texture_edges,
     sample_texture_positions,
     trilinear_sample,
 )
@@ -81,6 +82,30 @@ def test_apply_denoise_respects_mask() -> None:
 
     assert denoised[2, 2] < 1.0
     assert denoised[0, 0] == 0.0
+
+
+def test_pad_texture_edges_extends_nearest_valid_values_into_padding() -> None:
+    texture = np.array([
+        [10.0, 0.0, 0.0, 0.0, 0.0],
+        [0.0, 20.0, 0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0, 0.0, 0.0],
+    ])
+    uv_mask = np.array([
+        [1.0, 0.0, 0.0, 0.0, 0.0],
+        [0.0, 1.0, 0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0, 0.0, 0.0],
+        [0.0, 0.0, 0.0, 0.0, 0.0],
+    ])
+
+    padded = pad_texture_edges(texture, uv_mask, iterations=1)
+
+    assert np.array_equal(padded[uv_mask > 0], texture[uv_mask > 0])
+    assert padded[0, 1] in {10.0, 20.0}
+    assert padded[1, 0] in {10.0, 20.0}
+    assert padded[4, 4] == 0.0
 
 
 def test_barycentric_coordinates_return_nan_for_degenerate_triangles() -> None:

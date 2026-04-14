@@ -273,3 +273,40 @@ def apply_denoise(texture: np.ndarray, uv_mask: np.ndarray, sigma: float) -> np.
     result[valid] = blurred_values[valid] / blurred_weights[valid]
     result[uv_mask <= 0] = 0.0
     return result
+
+
+def pad_texture_edges(texture: np.ndarray, uv_mask: np.ndarray, iterations: int = 16) -> np.ndarray:
+    """Extend valid texel values into nearby uncovered padding texels.
+
+    This is a display-only fix for UV atlas filtering artifacts: Polyscope may
+    sample just outside the covered UV region, so we copy nearby valid texel
+    values into the atlas padding instead of leaving zeros there.
+    """
+    if iterations <= 0:
+        return texture.copy()
+
+    valid_mask = uv_mask > 0
+    if not np.any(valid_mask):
+        return texture.copy()
+
+    valid_rows, valid_cols = np.where(valid_mask)
+    labels = np.zeros(texture.shape, dtype=np.float32)
+    labels[valid_rows, valid_cols] = np.arange(1, len(valid_rows) + 1, dtype=np.float32)
+    frontier = labels.copy()
+    kernel = np.ones((3, 3), dtype=np.uint8)
+
+    for _ in range(iterations):
+        grown = cv2.dilate(frontier, kernel, iterations=1)
+        new_pixels = (~valid_mask) & (labels == 0) & (grown > 0)
+        if not np.any(new_pixels):
+            break
+        labels[new_pixels] = grown[new_pixels]
+        frontier = np.zeros_like(labels)
+        frontier[new_pixels] = labels[new_pixels]
+
+    padded = texture.copy()
+    padded_mask = (~valid_mask) & (labels > 0)
+    if np.any(padded_mask):
+        source_indices = labels[padded_mask].astype(np.int64) - 1
+        padded[padded_mask] = texture[valid_rows[source_indices], valid_cols[source_indices]]
+    return padded

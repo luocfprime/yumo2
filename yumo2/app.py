@@ -35,7 +35,7 @@ from yumo2.settings import (
     save_profile,
     set_active_profile,
 )
-from yumo2.texture import apply_denoise, sample_texture_positions, trilinear_sample, unwrap_uv
+from yumo2.texture import apply_denoise, pad_texture_edges, sample_texture_positions, trilinear_sample, unwrap_uv
 from yumo2.ui import (
     ui_available_width,
     ui_equal_widths,
@@ -472,9 +472,11 @@ class PolyscopeApp:
         self._session.texel_positions = texel_positions
 
         if self.settings.denoise_enabled and self.settings.denoise_sigma > 0:
-            self._session.texture = apply_denoise(raw_texture, self._session.uv_mask, self.settings.denoise_sigma)
+            display_texture = apply_denoise(raw_texture, self._session.uv_mask, self.settings.denoise_sigma)
         else:
-            self._session.texture = raw_texture
+            display_texture = raw_texture
+
+        self._session.texture = pad_texture_edges(display_texture, self._session.uv_mask)
 
         self._session.effective_range = (
             finite_minmax(transformed_samples) if transformed_samples is not None else self._current_range()
