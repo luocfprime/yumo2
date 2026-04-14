@@ -1,0 +1,24 @@
+version = 1
+
+[[annotations]]
+path = [
+    ".gitattributes",
+    ".github/**",
+    ".gitignore",
+    ".pre-commit-config.yaml",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "CONTRIBUTING.md",
+    "Makefile",
+    "README.md",
+    "docs/**",
+    "mkdocs.yml",
+    "pyproject.toml",
+    "scripts/README.md",
+    "tox.ini",
+    "uv.lock",
+    "yumo2/assets/**",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2025 Chaofan Luo"
+SPDX-License-Identifier = "AGPL-3.0-or-later OR LicenseRef-Yumo2-Commercial"
